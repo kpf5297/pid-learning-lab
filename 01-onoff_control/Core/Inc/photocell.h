@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include "logger.h"
 
 // Default configuration macros (raw ADC range for 12-bit)
 #define DEFAULT_SCALING    true

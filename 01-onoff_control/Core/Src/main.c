@@ -119,12 +119,10 @@ int main(void)
   Log(LOG_LEVEL_INFO, "Photocell initialized with scaling: %s, min: %d, max: %d\n", 
       photocell.scaled ? "true" : "false", photocell.min_value, photocell.max_value);
 
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2); // Start PWM on
-
   LedPwm_init(&led_pwm, &htim2, TIM_CHANNEL_2);
   LedPwm_start(&led_pwm);
   LedPwm_setDuty(&led_pwm, 50); // Set initial duty cycle to 50%
-  Log(LOG_LEVEL_INFO, "LED PWM initialized and started with 50%% duty cycle.\n");
+
 
   /* USER CODE END 2 */
 
@@ -145,10 +143,7 @@ int main(void)
     uint8_t inverted = 100 - light_level;  // Invert brightness
     LedPwm_setDuty(&led_pwm, inverted);
 
-    Log(LOG_LEVEL_DEBUG, "Light level: %d (raw: %d), LED duty cycle set to: %d%%\n", 
-        photocell.current_level, photocell.last_raw_value, inverted);
-
-    HAL_Delay(100); // Delay for 100 ms
+    HAL_Delay(500); // Delay for 100 ms
 
   }
   /* USER CODE END 3 */

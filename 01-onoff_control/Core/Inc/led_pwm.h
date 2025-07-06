@@ -3,6 +3,7 @@
 
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
+#include "logger.h"
 
 /**
  * @brief PWM-controlled LED interface.

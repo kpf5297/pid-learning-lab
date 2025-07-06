@@ -13,6 +13,9 @@ void photoCell_init(photoCell_t* sensor, bool scaled, uint16_t min_value, uint16
     sensor->max_value = max_value;
     sensor->current_level = 0;
     sensor->last_raw_value = 0;
+
+    Log(LOG_LEVEL_DEBUG, "Photocell initialized: scaled=%s, min=%d, max=%d\n", 
+        sensor->scaled ? "true" : "false", sensor->min_value, sensor->max_value);
 }
 
 uint8_t readSensor(photoCell_t* sensor) {
@@ -36,5 +39,9 @@ uint8_t readSensor(photoCell_t* sensor) {
     }
 
     sensor->current_level = value;
+
+    Log(LOG_LEVEL_DEBUG, "Photocell read: raw=%d, scaled=%s, value=%d\n", 
+        raw, sensor->scaled ? "true" : "false", value);
+        
     return value;
 }
