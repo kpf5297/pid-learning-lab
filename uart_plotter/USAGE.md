@@ -16,7 +16,7 @@ python uart_plot.py
 ## Windows
 
 ```bash
-git clone https://github.com/yourname/uart_plotter.git
+git clone https://github.com/kpf5297/pid-learning-lab.git
 cd uart_plotter
 python -m venv venv
 venv\Scripts\activate   # or .\venv\Scripts\Activate.ps1 in PowerShell
