@@ -51,6 +51,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/led_pwm.c
     Core/Src/logger.c
     Core/Src/photocell.c
+    Core/Src/pid.c
 )
 
 # Add include paths

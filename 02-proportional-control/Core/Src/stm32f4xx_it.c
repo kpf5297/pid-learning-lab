@@ -22,10 +22,13 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
+#include "main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
+extern volatile bool tick_1ms;
 
 /* USER CODE END TD */
 
@@ -188,6 +191,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
+  tick_1ms = true; // Set the flag to indicate 1 ms has passed
 
   /* USER CODE END SysTick_IRQn 1 */
 }

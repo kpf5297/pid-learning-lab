@@ -21,9 +21,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "PhotoCell.h"
 #include "led_pwm.h"
 #include "logger.h"
 #include "photocell.h"
+#include "pid.h"
 
 /* USER CODE END Includes */
 
@@ -50,6 +52,8 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+volatile bool tick_1ms = false;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -75,6 +79,22 @@ LedPwm_t led_pwm = {
     .channel = TIM_CHANNEL_2,
     .duty_percent = 0
 };
+
+pid_t led_ctrl = PID_DEFAULTS;
+
+void app_init(void)
+{
+    pid_init(&led_ctrl, 0.6f, 20.0f, 0.0f, 100.0f); 
+
+    Log_Init();
+    Log_SetLevel(LOG_LEVEL_DEBUG);
+    Log(LOG_LEVEL_INFO, "System initialized.\n"); 
+
+    photoCell_init(&photocell, DEFAULT_SCALING, DEFAULT_MIN_READ, DEFAULT_MAX_READ);
+
+    LedPwm_init(&led_pwm, &htim2, TIM_CHANNEL_2);
+    LedPwm_start(&led_pwm);
+}
 
 /* USER CODE END 0 */
 
@@ -112,17 +132,9 @@ int main(void)
   MX_TIM2_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  Log_Init();
-  Log_SetLevel(LOG_LEVEL_DEBUG);
-  Log(LOG_LEVEL_INFO, "System initialized.\n"); 
+  app_init();
 
-  photoCell_init(&photocell, DEFAULT_SCALING, DEFAULT_MIN_READ, DEFAULT_MAX_READ);
-  Log(LOG_LEVEL_INFO, "Photocell initialized with scaling: %s, min: %d, max: %d\n", 
-      photocell.scaled ? "true" : "false", photocell.min_value, photocell.max_value);
-
-  LedPwm_init(&led_pwm, &htim2, TIM_CHANNEL_2);
-  LedPwm_start(&led_pwm);
-  LedPwm_setDuty(&led_pwm, 50); // Set initial duty cycle to 50%
+  uint32_t t_ms = 0;
 
   /* USER CODE END 2 */
 
@@ -133,11 +145,22 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    uint8_t light_level = readSensor(&photocell);
-    uint8_t inverted = 100 - light_level;  // Invert brightness
-    LedPwm_setDuty(&led_pwm, inverted);
 
-    HAL_Delay(500); // Delay for 100 ms
+    /* 1-kHz time-base ----------------------------------------- */
+    if (!tick_1ms) continue;
+    tick_1ms = false;
+    t_ms++;
+
+    /* Every 10 ms: sample sensor & update control ------------- */
+    if (t_ms % 10 == 0)
+    {
+        float lux_pct = readSensor(&photocell);  /* 0–1 */
+        float duty    = PID_COMPUTE(&led_ctrl, lux_pct);
+        LedPwm_setDuty(&led_pwm, duty);
+    }
+
+    /* Optional: stream data out UART for your logger ---------- */
+    // if (t_ms % 100 == 0) log_telemetry(lux_pct, duty);
   }
   /* USER CODE END 3 */
 }
