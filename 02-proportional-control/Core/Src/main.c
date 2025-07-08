@@ -84,7 +84,7 @@ pid_t led_ctrl = PID_DEFAULTS;
 
 void app_init(void)
 {
-    pid_init(&led_ctrl, 0.6f, 20.0f, 0.0f, 100.0f); 
+    pid_init(&led_ctrl, 1.2f, 60.0f, 0.0f, 100.0f);
 
     Log_Init();
     Log_SetLevel(LOG_LEVEL_DEBUG);

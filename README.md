@@ -31,4 +31,13 @@ Each stage includes:
 
 ---
 
-This repo is a learning tool, and I welcome feedback or collaboration from fellow engineers and hobbyists.
+### Images of Hardware Setup and Results
+
+![Kp set to 1.2 in graph](image.png)
+Note: The image shows the LED brightness response with Kp set to 1.2, demonstrating the system's behavior under proportional control.
+
+![Setup of STM32F446 Nucleo and breadboard with optoresistor and led wired to board.  External 3.3V supply is connected to the breadboard.](image-1.png)
+Note: This image shows the hardware setup with the STM32F446 Nucleo board, LED, and CDS-55 photoresistor connected to a breadboard with an external 3.3V supply.
+
+![This image shows the photresistor spacing relative to the LED.  In the testing it was covered to prvent noise from ambient light.](image-2.png)
+Note: The photoresistor is positioned relative to the LED, covered to minimize noise from ambient light during testing.
