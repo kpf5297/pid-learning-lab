@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "PhotoCell.h"
+#include "photocell.h"
 #include "led_pwm.h"
 #include "logger.h"
 #include "photocell.h"
