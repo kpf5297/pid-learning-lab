@@ -24,7 +24,6 @@
 #include "photocell.h"
 #include "led_pwm.h"
 #include "logger.h"
-#include "photocell.h"
 #include "pid.h"
 
 /* USER CODE END Includes */

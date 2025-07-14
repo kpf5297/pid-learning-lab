@@ -21,6 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "photocell.h" 
+#include "led_pwm.h"
+#include "logger.h"
 
 /* USER CODE END Includes */
 
@@ -64,6 +67,17 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+photoCell_t photocell_sensor;
+LedPwm_t led_pwm = {
+    .htim = &htim2,
+    .channel = TIM_CHANNEL_2,
+    .duty_percent = 0
+};
+
+void set_pwm_function(uint8_t brightness) {
+    // Example function to set PWM brightness
+    LedPwm_setDuty(&led_pwm, brightness);
+}
 
 /* USER CODE END 0 */
 
@@ -102,6 +116,20 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  Log_Init();  // Initialize logging system
+  Log_SetLevel(LOG_LEVEL_DEBUG);  // Set log level to DEBUG
+
+  LedPwm_init(&led_pwm, &htim2, TIM_CHANNEL_2);
+  LedPwm_start(&led_pwm);
+  Log(LOG_LEVEL_INFO, "LED PWM initialized on TIM2 channel 2\n");
+  Log(LOG_LEVEL_INFO, "System initialized. Starting photocell calibration...\n");
+
+  photoCell_init(&photocell_sensor, true, 0, 4095);
+  photoCell_autoCalibrate(&photocell_sensor, &hadc1, set_pwm_function);
+  Log(LOG_LEVEL_INFO, "Photocell initialized and calibrated. Min: %d, Max: %d\n", 
+      photocell_sensor.min_value, photocell_sensor.max_value);
+  Log(LOG_LEVEL_INFO, "Starting main loop...\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,6 +139,21 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+    // Set to 25, 50, 75, 100% duty cycle in a loop and log the photocell reading
+    for (uint8_t duty = 0; duty <= 100; duty += 25) {
+        LedPwm_setDuty(&led_pwm, duty);
+        HAL_Delay(500);  // Allow time for LED to stabilize
+
+        uint8_t light_level = readSensor(&photocell_sensor, &hadc1);
+        Log(LOG_LEVEL_INFO, "Duty: %d%%, Light Level: %d\n", duty, light_level);
+    }
+
+    if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_SET) {
+        Log(LOG_LEVEL_INFO, "Button pressed, toggling LED state.\n");
+        HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);  // Toggle LED state
+        HAL_Delay(500);  // Debounce delay
+    }
   }
   /* USER CODE END 3 */
 }
