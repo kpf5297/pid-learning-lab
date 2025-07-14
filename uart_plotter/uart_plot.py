@@ -1,3 +1,4 @@
+import argparse
 import serial
 import re
 import csv
@@ -7,9 +8,19 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 # === CONFIG ===
-SERIAL_PORT = '/dev/tty.usbmodem1103' 
+DEFAULT_SERIAL_PORT = '/dev/tty.usbmodem1103'
 BAUD_RATE = 115200
 MAX_POINTS = 200
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description="Real-time UART plotting tool")
+parser.add_argument(
+    "--serial-port",
+    default=DEFAULT_SERIAL_PORT,
+    help="Serial device to read from (e.g. /dev/ttyUSB0 or COM5)",
+)
+args = parser.parse_args()
+SERIAL_PORT = args.serial_port
 
 # === CSV LOG SETUP ===
 csv_filename = f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
