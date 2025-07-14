@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/kevinfox/Code/pid-learning-lab/02-proportional-control/cmake_install.cmake",
-		"/Users/kevinfox/Code/pid-learning-lab/02-proportional-control/cmake/stm32cubemx/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
