@@ -1,4 +1,4 @@
-#include "PhotoCell.h"
+#include "photocell.h"
 #include "stm32f4xx_hal.h"  // or whatever matches your MCU
 
 extern ADC_HandleTypeDef hadc1;  // Your global ADC handle
