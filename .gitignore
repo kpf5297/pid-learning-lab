@@ -1,0 +1,21 @@
+# macOS metadata
+.DS_Store
+
+# Python virtual environments
+venv/
+.env/
+.venv/
+
+# Build directories
+build/
+*/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build.ninja
+compile_commands.json
+
+# Editor directories
+.vscode/
+.idea/
+.settings/
