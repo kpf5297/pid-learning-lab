@@ -13,8 +13,8 @@ This repository documents my learning concepts of PID control, inspired by the *
 Each folder documents a distinct control strategy:
 1. `01-onoff_control` — Basic bang-bang control
 2. `02-proportional_control` — Smooth response with proportional feedback
-3. `03-pi_control` — Reduced steady-state error with integral action
-4. `04-pid_control` — Full PID implementation
+
+Additional stages for PI and full PID control will be added as development continues.
 
 Each stage includes:
 - Firmware source code
