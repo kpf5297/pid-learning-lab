@@ -5,11 +5,20 @@ import time
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import argparse
 
 # === CONFIG ===
-SERIAL_PORT = '/dev/tty.usbmodem1103' 
+DEFAULT_PORT = '/dev/tty.usbmodem1103'
 BAUD_RATE = 115200
 MAX_POINTS = 200
+
+# === ARGUMENTS ===
+parser = argparse.ArgumentParser(description='Plot and log UART output')
+parser.add_argument('-p', '--port', default=DEFAULT_PORT,
+                    help='Serial port to read from (default: %(default)s)')
+args = parser.parse_args()
+
+SERIAL_PORT = args.port
 
 # === CSV LOG SETUP ===
 csv_filename = f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
