@@ -223,7 +223,11 @@ void Log_Poll(void)
 {
 #if LOG_USE_UART
     uint8_t byte;
+    uint16_t iteration_count = 0; // Counter to track iterations
     while (HAL_UART_Receive(&LOG_UART_HANDLE, &byte, 1, 0) == HAL_OK) {
+        if (++iteration_count > LOG_UART_MAX_ITERATIONS) {
+            break; // Exit the loop if the maximum iteration count is reached
+        }
         if (byte == '\n' || byte == '\r') {
             if (cmd_index > 0) {
                 cmd_buffer[cmd_index] = '\0';
