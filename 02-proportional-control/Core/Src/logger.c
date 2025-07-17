@@ -202,3 +202,50 @@ __attribute__((weak)) void Log_Write_SD(const char* msg) {
     }
 #endif
 }
+
+// === Telemetry & Command Support ===========================================
+
+static char cmd_buffer[64];
+static uint8_t cmd_index = 0;
+static Log_CommandCallback cmd_callback = NULL;
+
+void Log_SetCommandCallback(Log_CommandCallback cb)
+{
+    cmd_callback = cb;
+}
+
+__attribute__((weak)) void Log_CommandReceived(const char* cmd)
+{
+    Log(LOG_LEVEL_INFO, "CMD: %s\n", cmd);
+}
+
+void Log_Poll(void)
+{
+#if LOG_USE_UART
+    uint8_t byte;
+    uint16_t iteration_count = 0; // Counter to track iterations
+    while (HAL_UART_Receive(&LOG_UART_HANDLE, &byte, 1, 0) == HAL_OK) {
+        if (++iteration_count > LOG_UART_MAX_ITERATIONS) {
+            break; // Exit the loop if the maximum iteration count is reached
+        }
+        if (byte == '\n' || byte == '\r') {
+            if (cmd_index > 0) {
+                cmd_buffer[cmd_index] = '\0';
+                if (cmd_callback) {
+                    cmd_callback(cmd_buffer);
+                } else {
+                    Log_CommandReceived(cmd_buffer);
+                }
+                cmd_index = 0;
+            }
+        } else if (cmd_index < sizeof(cmd_buffer) - 2) {
+            cmd_buffer[cmd_index++] = (char)byte;
+        }
+    }
+#endif
+}
+
+void Log_Telemetry(uint8_t lux_percent, uint8_t duty_percent)
+{
+    Log(LOG_LEVEL_INFO, "telemetry,%u,%u\n", lux_percent, duty_percent);
+}
