@@ -102,3 +102,39 @@ __attribute__((weak)) void Log_Write_UART(const char* msg);
  * @param msg Null-terminated string to write to file.
  */
 __attribute__((weak)) void Log_Write_SD(const char* msg);
+
+/**
+ * @brief Send simple telemetry data over the logging backend.
+ *
+ * This helper prints a comma separated line of the form
+ * `telemetry,<lux>,<duty>\n` which can be parsed by host tools.
+ *
+ * @param lux_percent  Current light level in percent (0-100)
+ * @param duty_percent Current PWM duty cycle in percent (0-100)
+ */
+void Log_Telemetry(uint8_t lux_percent, uint8_t duty_percent);
+
+/** Callback type used when a command is received over UART. */
+typedef void (*Log_CommandCallback)(const char* cmd);
+
+/**
+ * @brief Register a callback for processing incoming UART commands.
+ *
+ * When characters terminated by a newline are received via UART,
+ * the callback will be invoked with the assembled command string.
+ */
+void Log_SetCommandCallback(Log_CommandCallback cb);
+
+/**
+ * @brief Poll the UART for incoming bytes and dispatch completed commands.
+ *
+ * Call periodically from the main loop to process command input.
+ */
+void Log_Poll(void);
+
+/**
+ * @brief Default handler for received commands (weak).
+ *        Applications may override this to implement custom behaviour.
+ * @param cmd Null-terminated command string.
+ */
+__attribute__((weak)) void Log_CommandReceived(const char* cmd);
