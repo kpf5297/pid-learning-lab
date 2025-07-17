@@ -234,7 +234,7 @@ void Log_Poll(void)
                 }
                 cmd_index = 0;
             }
-        } else if (cmd_index < sizeof(cmd_buffer) - 1) {
+        } else if (cmd_index < sizeof(cmd_buffer) - 2) {
             cmd_buffer[cmd_index++] = (char)byte;
         }
     }
