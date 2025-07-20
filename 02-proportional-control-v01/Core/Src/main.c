@@ -43,6 +43,7 @@ static uart_drv_t uart2_drv;
 uart_drv_t *shared_uart = NULL;
 static SemaphoreHandle_t rx_done_sem;
 PwmChannel_t pwm;
+photoCell_t sensor;
 // PID control parameters and state
 volatile bool pid_enabled = false;
 float pid_kp = 1.0f;
@@ -160,9 +161,9 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 
-//  xTaskCreate(PhotoCellTask, "photo", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
-//
-//  vTaskStartScheduler();
+  xTaskCreate(PhotoCellTask, "photo", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
+
+  vTaskStartScheduler();
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -427,10 +428,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void set_pwm_function(uint8_t brightness) {
+
+	Pwm_setDuty(&pwm, (uint8_t)brightness);
+}
+
 static void PhotoCellTask(void *arg) {
-    photoCell_t sensor;
+
     TelemetryPacket pkt = {0};
-    photoCell_init(&sensor, true, 200, 3900);
+    photoCell_init(&sensor, true, 0, 4095);
+    photoCell_autoCalibrate(&sensor, &hadc1, set_pwm_function);
 
     for (;;) {
         uint8_t level = readSensor(&sensor, &hadc1);
@@ -455,7 +462,7 @@ static void PhotoCellTask(void *arg) {
 
 
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+//        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

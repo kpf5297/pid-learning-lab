@@ -43,8 +43,8 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
     uint32_t sum_high = 0;
 
     // Set LED fully ON
-    set_pwm(255);
-    HAL_Delay(100);  // allow sensor to settle
+    set_pwm(100);
+    HAL_Delay(10000);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
         HAL_ADC_Start(hadc);
         HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
@@ -53,7 +53,7 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
 
     // Set LED fully OFF
     set_pwm(0);
-    HAL_Delay(100);  // allow sensor to settle
+    HAL_Delay(10000);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
         HAL_ADC_Start(hadc);
         HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
