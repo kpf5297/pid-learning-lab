@@ -96,10 +96,10 @@ static void log_task(void *arg)
         TelemetryPacket pkt;
         if (xQueueReceive(telemetry_queue, &pkt, 0) == pdPASS) {
             int len = snprintf(out_buf, sizeof(out_buf),
-                               "[%lu.%03lu] TLM sensor1=%lu sensor2=%.2f\r\n",
+                               "[%lu.%03lu] TLM brightness=%.2f duty=%.2f\r\n",
                                get_current_timestamp().seconds,
                                get_current_timestamp().subseconds,
-                               pkt.sensor1, pkt.sensor2);
+                               pkt.brightness, pkt.duty);
 
             uart_send_blocking(log_uart, (uint8_t *)out_buf, len, 100);
         }

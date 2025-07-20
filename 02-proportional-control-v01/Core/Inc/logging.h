@@ -59,10 +59,10 @@ typedef struct {
     char      payload[MAX_LOG_PAYLOAD];
 } LogEntry;
 
-/** Example telemetry packet structure. */
+/** Telemetry packet for runtime brightness and duty cycle. */
 typedef struct {
-    uint32_t sensor1;
-    float sensor2;
+    float brightness;  /**< Measured brightness level */
+    float duty;        /**< Current PWM duty cycle */
 } TelemetryPacket;
 
 /**

@@ -452,8 +452,8 @@ static void PhotoCellTask(void *arg) {
             if (duty > 100.0f) duty = 100.0f;
             Pwm_setDuty(&pwm, (uint8_t)duty);
 
-            pkt.sensor1 = duty;
-            pkt.sensor2 = level;
+            pkt.brightness = level;
+            pkt.duty       = duty;
 
             telemetry_send(&pkt);
         } else {
