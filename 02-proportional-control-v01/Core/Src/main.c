@@ -48,7 +48,7 @@ volatile bool pid_enabled = false;
 float pid_kp = 1.0f;
 // PID setpoint: Target value for the PID controller in units of lumens (expected range: 0.0f to 100.0f).
 #define PID_SETPOINT 60.0f
-static const float pid_setpoint = PID_SETPOINT;
+float pid_setpoint = PID_SETPOINT;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

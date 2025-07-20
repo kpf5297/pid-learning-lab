@@ -23,6 +23,8 @@ void cmd_pid_start(Args *args);
 void cmd_pid_stop(Args *args);
 /** Set proportional gain Kp. */
 void cmd_kp(Args *args);
+/** Set PID setpoint. */
+void cmd_sp(Args *args);
 
 /** Table of available commands. */
 extern const Command cmd_list[];
