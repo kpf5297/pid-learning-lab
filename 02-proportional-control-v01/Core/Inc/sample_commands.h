@@ -17,6 +17,12 @@ void cmd_help(Args *args);
 void cmd_echo(Args *args);
 /** Add two integers and output result. */
 void cmd_add(Args *args);
+/** Enable PID control loop. */
+void cmd_pid_start(Args *args);
+/** Disable PID control loop. */
+void cmd_pid_stop(Args *args);
+/** Set proportional gain Kp. */
+void cmd_kp(Args *args);
 
 /** Table of available commands. */
 extern const Command cmd_list[];

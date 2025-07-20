@@ -8,9 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "pwm.h"
 
 // Shared UART driver instance provided by application
 extern uart_drv_t *shared_uart;
+extern volatile bool pid_enabled;
+extern float pid_kp;
+extern PwmChannel_t pwm;
 
 // Helper to send strings over UART (blocking with 100ms timeout)
 static void send_str(const char *s) {
@@ -51,11 +55,37 @@ void cmd_add(Args *args) {
     send_str(buf);
 }
 
+// 'pid_start' command: enable PID loop
+void cmd_pid_start(Args *args) {
+    pid_enabled = true;
+    send_str("PID started\r\n");
+}
+
+// 'pid_stop' command: disable PID loop
+void cmd_pid_stop(Args *args) {
+    pid_enabled = false;
+    Pwm_setDuty(&pwm, 0);
+    send_str("PID stopped\r\n");
+}
+
+// 'kp' command: set proportional gain
+void cmd_kp(Args *args) {
+    if (args->argc != 2) {
+        send_str("Usage: kp <value>\r\n");
+        return;
+    }
+    pid_kp = strtof(args->argv[1], NULL);
+    send_str("OK\r\n");
+}
+
 // Define command table and expose to interpreter
 const Command cmd_list[] = {
     { "help", cmd_help },
     { "echo", cmd_echo  },
     { "add",  cmd_add   },
+    { "pid_start", cmd_pid_start },
+    { "pid_stop",  cmd_pid_stop  },
+    { "kp",        cmd_kp        },
 };
 const size_t cmd_count = sizeof(cmd_list) / sizeof(cmd_list[0]);
 
