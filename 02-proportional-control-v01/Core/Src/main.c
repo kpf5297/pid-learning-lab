@@ -43,7 +43,12 @@ static uart_drv_t uart2_drv;
 uart_drv_t *shared_uart = NULL;
 static SemaphoreHandle_t rx_done_sem;
 PwmChannel_t pwm;
-
+// PID control parameters and state
+volatile bool pid_enabled = false;
+float pid_kp = 1.0f;
+// PID setpoint: Target value for the PID controller in units of lumens (expected range: 0.0f to 100.0f).
+#define PID_SETPOINT 60.0f
+static const float pid_setpoint = PID_SETPOINT;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -430,12 +435,22 @@ static void PhotoCellTask(void *arg) {
     for (;;) {
         uint8_t level = readSensor(&sensor, &hadc1);
 
+        if (pid_enabled) {
+            float error = pid_setpoint - level;
+            float duty  = pid_kp * error;
+            if (duty < 0.0f) duty = 0.0f;
+            if (duty > 100.0f) duty = 100.0f;
+            Pwm_setDuty(&pwm, (uint8_t)duty);
+        } else {
+            Pwm_setDuty(&pwm, 0);
+        }
+
         pkt.sensor1++;
         pkt.sensor2 = level;
 
         telemetry_send(&pkt);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
