@@ -1,0 +1,4 @@
+../Core/Src/sample_commands.c:16:13:send_str	2
+../Core/Src/sample_commands.c:23:6:cmd_help	2
+../Core/Src/sample_commands.c:33:6:cmd_echo	3
+../Core/Src/sample_commands.c:42:6:cmd_add	2
