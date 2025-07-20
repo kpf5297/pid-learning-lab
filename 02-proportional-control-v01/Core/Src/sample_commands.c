@@ -85,7 +85,17 @@ void cmd_sp(Args *args) {
         send_str("Usage: sp <value>\r\n");
         return;
     }
-    pid_setpoint = strtof(args->argv[1], NULL);
+    char *endptr;
+    float value = strtof(args->argv[1], &endptr);
+    if (endptr == args->argv[1] || *endptr != '\0') {
+        send_str("Error: Invalid number format\r\n");
+        return;
+    }
+    if (value < 0.0f || value > 100.0f) {
+        send_str("Error: Value out of range (0.0 - 100.0)\r\n");
+        return;
+    }
+    pid_setpoint = value;
     send_str("OK\r\n");
 }
 
