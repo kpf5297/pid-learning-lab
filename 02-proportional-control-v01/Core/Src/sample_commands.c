@@ -14,6 +14,7 @@
 extern uart_drv_t *shared_uart;
 extern volatile bool pid_enabled;
 extern float pid_kp;
+extern float pid_setpoint;
 extern PwmChannel_t pwm;
 
 // Helper to send strings over UART (blocking with 100ms timeout)
@@ -78,6 +79,26 @@ void cmd_kp(Args *args) {
     send_str("OK\r\n");
 }
 
+// 'sp' command: set PID setpoint
+void cmd_sp(Args *args) {
+    if (args->argc != 2) {
+        send_str("Usage: sp <value>\r\n");
+        return;
+    }
+    char *endptr;
+    float value = strtof(args->argv[1], &endptr);
+    if (endptr == args->argv[1] || *endptr != '\0') {
+        send_str("Error: Invalid number format\r\n");
+        return;
+    }
+    if (value < 0.0f || value > 100.0f) {
+        send_str("Error: Value out of range (0.0 - 100.0)\r\n");
+        return;
+    }
+    pid_setpoint = value;
+    send_str("OK\r\n");
+}
+
 // Define command table and expose to interpreter
 const Command cmd_list[] = {
     { "help", cmd_help },
@@ -86,6 +107,7 @@ const Command cmd_list[] = {
     { "pid_start", cmd_pid_start },
     { "pid_stop",  cmd_pid_stop  },
     { "kp",        cmd_kp        },
+    { "sp",        cmd_sp        },
 };
 const size_t cmd_count = sizeof(cmd_list) / sizeof(cmd_list[0]);
 
