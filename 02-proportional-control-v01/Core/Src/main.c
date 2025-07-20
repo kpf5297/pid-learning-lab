@@ -160,9 +160,9 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 
-  xTaskCreate(PhotoCellTask, "photo", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
-
-  vTaskStartScheduler();
+//  xTaskCreate(PhotoCellTask, "photo", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
+//
+//  vTaskStartScheduler();
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -175,7 +175,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  HAL_Delay(100);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -434,21 +434,26 @@ static void PhotoCellTask(void *arg) {
 
     for (;;) {
         uint8_t level = readSensor(&sensor, &hadc1);
+        float error = pid_setpoint - level;
+        float duty  = pid_kp * error;
+
 
         if (pid_enabled) {
-            float error = pid_setpoint - level;
+            error = pid_setpoint - level;
             float duty  = pid_kp * error;
             if (duty < 0.0f) duty = 0.0f;
             if (duty > 100.0f) duty = 100.0f;
             Pwm_setDuty(&pwm, (uint8_t)duty);
+
+            pkt.sensor1 = duty;
+            pkt.sensor2 = level;
+
+            telemetry_send(&pkt);
         } else {
             Pwm_setDuty(&pwm, 0);
         }
 
-        pkt.sensor1++;
-        pkt.sensor2 = level;
 
-        telemetry_send(&pkt);
 
         vTaskDelay(pdMS_TO_TICKS(100));
     }
