@@ -1,0 +1,7 @@
+../Core/Src/fault_module.c:21:18:get_current_timestamp_local	32	static
+../Core/Src/fault_module.c:30:6:fault_init	8	static
+../Core/Src/fault_module.c:35:6:fault_raise	32	static,ignoring_inline_asm
+../Core/Src/fault_module.c:47:6:fault_clear	16	static,ignoring_inline_asm
+../Core/Src/fault_module.c:56:6:fault_is_active	16	static
+../Core/Src/fault_module.c:62:6:fault_clear_all	4	static,ignoring_inline_asm
+../Core/Src/fault_module.c:69:13:fault_to_string	16	static

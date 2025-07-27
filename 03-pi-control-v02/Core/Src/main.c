@@ -19,9 +19,18 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "FreeRTOS.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "uart_driver_config.h"
+#include "uart_driver.h"
+#include "logging.h"
+#include "fault_module.h"
+#include "sample_commands.h"
+#include "command_module.h"
+#include "photocell.h"
+#include "pwm.h"
 
 /* USER CODE END Includes */
 
@@ -32,6 +41,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PID_SETPOINT 60.0f
+float pid_setpoint = PID_SETPOINT;
 
 /* USER CODE END PD */
 
@@ -49,9 +60,14 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
-osThreadId defaultTaskHandle;
+//osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-
+uart_drv_t shared_uart;
+PwmChannel_t pwm;
+photoCell_t sensor;
+// PID control parameters and state
+volatile bool pid_enabled = false;
+float pid_kp = 1.0f;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,9 +77,11 @@ static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
-void StartDefaultTask(void const * argument);
+//void StartDefaultTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
+//static void TestTask(void *arg);
+static void PIDControlTask(void const *arg);
 
 /* USER CODE END PFP */
 
@@ -107,6 +125,14 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
+  uart_init(&shared_uart, &huart2, &hdma_usart2_tx, &hdma_usart2_rx);
+  log_init(&shared_uart);
+  log_write(LOG_LEVEL_INFO, "Started");
+
+#if USE_CMD_INTERPRETER
+  cmd_init(&shared_uart);
+#endif
+
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -127,11 +153,18 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+//  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+//  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+//  osThreadDef(testTask, TestTask, osPriorityAboveNormal, 0, 256);
+//  osThreadCreate(osThread(testTask), NULL);
+
+    osThreadDef(PIDTask, PIDControlTask, osPriorityAboveNormal, 0, 256);
+    osThreadCreate(osThread(PIDTask), NULL);
+
+
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -146,6 +179,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    
   }
   /* USER CODE END 3 */
 }
@@ -320,7 +354,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 2000000;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -396,6 +430,64 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+//static void TestTask(void *arg) {
+//    TelemetryPacket pkt = {0};
+//
+//    for (;;) {
+//        // Raise a test fault
+//        static uint32_t faultCode = FAULT_OVERCURRENT;
+//        fault_raise((FaultCode)faultCode);
+//        log_write(LOG_LEVEL_INFO, "Raised fault: %s", fault_to_string((FaultCode)faultCode));
+//
+//        // Send a telemetry packet
+//        pkt.sensor1++;
+//        pkt.sensor2 += 0.5f;
+//        telemetry_send(&pkt);
+//
+//        // Clear the fault after 50 ms
+//        vTaskDelay(pdMS_TO_TICKS(50));
+//        fault_clear((FaultCode)faultCode);
+//        log_write(LOG_LEVEL_INFO, "Cleared fault: %s", fault_to_string((FaultCode)faultCode));
+//
+//        // Cycle fault code for next iteration
+//        faultCode++;
+//        if (faultCode >= FAULT_COUNT) faultCode = FAULT_OVERCURRENT;
+//
+//        // Wait 100 ms before next cycle
+//        vTaskDelay(pdMS_TO_TICKS(100));
+//    }
+//}
+
+void set_pwm_function(uint8_t brightness) {
+
+	Pwm_setDuty(&pwm, (uint8_t)brightness);
+}
+
+static void PIDControlTask(void const *arg) {
+    TelemetryPacket pkt = {0};
+    photoCell_init(&sensor, true, 0, 4095);
+    photoCell_autoCalibrate(&sensor, &hadc1, set_pwm_function);
+
+    for (;;) {
+        uint8_t level = readSensor(&sensor, &hadc1);
+        float error = pid_setpoint - level;
+        float duty  = pid_kp * error;
+
+        if (pid_enabled) {
+            if (duty < 0.0f) duty = 0.0f;
+            if (duty > 100.0f) duty = 100.0f;
+            Pwm_setDuty(&pwm, (uint8_t)duty);
+
+            pkt.brightness = level;
+            pkt.duty       = duty;
+
+            telemetry_send(&pkt);
+        }
+        else {
+            Pwm_setDuty(&pwm, 0);
+        } 
+    }
+}
 
 /* USER CODE END 4 */
 
@@ -406,16 +498,6 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
 
 /**
   * @brief  Period elapsed callback in non blocking mode
