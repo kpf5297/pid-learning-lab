@@ -51,7 +51,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/uart_driver_config.h ../Core/Inc/logging.h \
  ../Core/Inc/uart_driver.h ../Core/Inc/fault_module.h \
  ../Core/Inc/logging.h ../Core/Inc/sample_commands.h \
- ../Core/Inc/command_module.h ../Core/Inc/photocell.h ../Core/Inc/pwm.h
+ ../Core/Inc/command_module.h ../Core/Inc/command_module.h \
+ ../Core/Inc/photocell.h ../Core/Inc/pwm.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -109,6 +110,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/fault_module.h:
 ../Core/Inc/logging.h:
 ../Core/Inc/sample_commands.h:
+../Core/Inc/command_module.h:
 ../Core/Inc/command_module.h:
 ../Core/Inc/photocell.h:
 ../Core/Inc/pwm.h:

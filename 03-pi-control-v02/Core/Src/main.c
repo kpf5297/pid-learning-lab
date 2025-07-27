@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
-#include "FreeRTOS.h"
+ #include "cmsis_os.h"
+//#include "FreeRTOS.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -129,6 +129,9 @@ int main(void)
   log_init(&shared_uart);
   log_write(LOG_LEVEL_INFO, "Started");
 
+  Pwm_init(&pwm, &htim2, TIM_CHANNEL_2);
+  Pwm_start(&pwm);
+
 #if USE_CMD_INTERPRETER
   cmd_init(&shared_uart);
 #endif
@@ -161,14 +164,16 @@ int main(void)
 //  osThreadDef(testTask, TestTask, osPriorityAboveNormal, 0, 256);
 //  osThreadCreate(osThread(testTask), NULL);
 
-    osThreadDef(PIDTask, PIDControlTask, osPriorityAboveNormal, 0, 256);
-    osThreadCreate(osThread(PIDTask), NULL);
+     osThreadDef(PIDTask, PIDControlTask, osPriorityAboveNormal, 0, 256);
+     osThreadCreate(osThread(PIDTask), NULL);
 
+//  xTaskCreate(PIDControlTask, "PIDControl", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
 
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
-  osKernelStart();
+   osKernelStart();
+//  vTaskStartScheduler();
 
   /* We should never get here as control is now taken by the scheduler */
 

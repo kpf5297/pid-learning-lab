@@ -4,7 +4,7 @@
 /* Configuration options for UART driver modules */
 
 /* Command interpreter options */
-#define USE_CMD_INTERPRETER   0
+#define USE_CMD_INTERPRETER   1
 #define CMD_MAX_LINE_LEN      128
 #define CMD_MAX_PARAMS        8
 #define CMD_TASK_PRIO         (tskIDLE_PRIORITY + 1)

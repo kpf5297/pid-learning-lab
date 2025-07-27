@@ -1,0 +1,6 @@
+../Core/Src/command_module.c:19:13:cmd_tx_bytes	16	static
+../Core/Src/command_module.c:32:6:cmd_write	16	static
+../Core/Src/command_module.c:38:6:cmd_printf	56	static
+../Core/Src/command_module.c:63:13:uart_event_cb	24	static,ignoring_inline_asm
+../Core/Src/command_module.c:80:13:cmd_task	216	static
+../Core/Src/command_module.c:139:6:cmd_init	24	static
