@@ -1,5 +1,6 @@
 #include "photocell.h"
 #include "stm32f4xx_hal.h"  // HAL definitions for STM32F4
+#include "logger.h"
 
 /**
  * @brief Maps a value from one range to another.
@@ -14,6 +15,8 @@
  * @param out_max  Maximum of the output range.
  * @return long    Mapped output value.
  */
+#define PHOTOCELL_ADC_TIMEOUT_MS 10U
+
 static inline long map_range(long x, long in_min, long in_max, long out_min, long out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -46,8 +49,11 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
     set_pwm(255);
     HAL_Delay(100);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
-        HAL_ADC_Start(hadc);
-        HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
+        if (HAL_ADC_Start(hadc) != HAL_OK ||
+            HAL_ADC_PollForConversion(hadc, PHOTOCELL_ADC_TIMEOUT_MS) != HAL_OK) {
+            Log(LOG_LEVEL_ERROR, "ADC read failed during high calibration\n");
+            return;
+        }
         sum_high += HAL_ADC_GetValue(hadc);
     }
 
@@ -55,8 +61,11 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
     set_pwm(0);
     HAL_Delay(100);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
-        HAL_ADC_Start(hadc);
-        HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
+        if (HAL_ADC_Start(hadc) != HAL_OK ||
+            HAL_ADC_PollForConversion(hadc, PHOTOCELL_ADC_TIMEOUT_MS) != HAL_OK) {
+            Log(LOG_LEVEL_ERROR, "ADC read failed during low calibration\n");
+            return;
+        }
         sum_low += HAL_ADC_GetValue(hadc);
     }
 
@@ -81,8 +90,11 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
  * @return uint8_t  Scaled (0–100) or raw (0–255 clipped) light level.
  */
 uint8_t readSensor(photoCell_t* sensor, ADC_HandleTypeDef* hadc) {
-    HAL_ADC_Start(hadc);
-    HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
+    if (HAL_ADC_Start(hadc) != HAL_OK ||
+        HAL_ADC_PollForConversion(hadc, PHOTOCELL_ADC_TIMEOUT_MS) != HAL_OK) {
+        Log(LOG_LEVEL_ERROR, "ADC read failed\n");
+        return sensor->current_level;
+    }
     uint16_t raw = HAL_ADC_GetValue(hadc);
 
     sensor->last_raw_value = raw;
