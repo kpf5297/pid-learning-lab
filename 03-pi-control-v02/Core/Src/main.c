@@ -129,6 +129,8 @@ int main(void)
   log_init(&shared_uart);
   log_write(LOG_LEVEL_INFO, "Started");
 
+  photoCell_init(sensor, true, min_value, max_value)
+
   Pwm_init(&pwm, &htim2, TIM_CHANNEL_2);
   Pwm_start(&pwm);
 
