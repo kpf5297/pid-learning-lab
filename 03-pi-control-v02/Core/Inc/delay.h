@@ -10,7 +10,7 @@
  * CMSIS-RTOS v1, providing a non-blocking delay that allows other
  * tasks to run. Otherwise it falls back to the standard HAL_Delay.
  */
-#define PID_DELAY(ms) osDelay(ms)
+#define PID_DELAY(ms) osDelay(pdMS_TO_TICKS(ms))
 #else
 #define PID_DELAY(ms) HAL_Delay(ms)
 #endif
