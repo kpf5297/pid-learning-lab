@@ -1,5 +1,5 @@
 #include "photocell.h"
-#include "stm32f4xx_hal.h"  // HAL definitions for STM32F4
+#include "delay.h"  // HAL or FreeRTOS delay abstraction
 
 /**
  * @brief Maps a value from one range to another.
@@ -44,7 +44,7 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
 
     // Set LED fully ON
     set_pwm(255);
-    HAL_Delay(100);  // allow sensor to settle
+    PID_DELAY(100);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
         HAL_ADC_Start(hadc);
         HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
@@ -53,7 +53,7 @@ void photoCell_autoCalibrate(photoCell_t* sensor, ADC_HandleTypeDef* hadc, void 
 
     // Set LED fully OFF
     set_pwm(0);
-    HAL_Delay(100);  // allow sensor to settle
+    PID_DELAY(100);  // allow sensor to settle
     for (int i = 0; i < samples; i++) {
         HAL_ADC_Start(hadc);
         HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY);
