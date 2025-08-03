@@ -5,13 +5,23 @@
 #include <stdint.h>
 #include "logger.h"
 
+/** Maximum input value accepted by ::LedPwm_setDuty. */
+#ifndef LED_PWM_MAX_DUTY
+#define LED_PWM_MAX_DUTY 100U
+#endif
+
+/** Timer top (ARR) value used for 100% duty cycle. */
+#ifndef LED_PWM_TIMER_TOP
+#define LED_PWM_TIMER_TOP 100U
+#endif
+
 /**
  * @brief PWM-controlled LED interface.
  */
 typedef struct {
     TIM_HandleTypeDef* htim;  /**< Pointer to the timer handle */
     uint32_t channel;         /**< Timer channel used for PWM (e.g., TIM_CHANNEL_1) */
-    uint8_t duty_percent;     /**< Current duty cycle percentage (0–100) */
+    uint8_t duty_percent;     /**< Current duty cycle value (0–LED_PWM_MAX_DUTY) */
 } LedPwm_t;
 
 /**

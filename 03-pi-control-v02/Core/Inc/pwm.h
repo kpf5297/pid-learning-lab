@@ -5,6 +5,20 @@
 #include <stdint.h>
 #include "logging.h"
 
+/*
+ * These macros allow the application to define the range used for the PWM
+ * duty cycle and the corresponding timer top value.  By default the driver
+ * expects a percentage input (0-100) and a timer period of 100 ticks.  Define
+ * PWM_MAX_DUTY and PWM_TIMER_TOP before including this header to override.
+ */
+#ifndef PWM_MAX_DUTY
+#define PWM_MAX_DUTY 100U
+#endif
+
+#ifndef PWM_TIMER_TOP
+#define PWM_TIMER_TOP 100U
+#endif
+
 /* Module version definitions. These are maintained alongside the
  * implementation so applications do not need to include a separate
  * version header. Bump the numbers whenever the API or behavior
@@ -25,7 +39,7 @@ typedef struct {
     TIM_HandleTypeDef* htim;  /**< Initialized timer handle controlling the PWM */
     uint32_t channel;         /**< Timer channel (e.g. @ref TIM_CHANNEL_1) */
     uint32_t period;          /**< Timer period (ARR value) used for duty calc */
-    uint8_t duty_percent;     /**< Last duty cycle that was programmed */
+    uint8_t duty_percent;     /**< Last duty cycle value programmed */
 } PwmChannel_t;
 
 /** Initialize a PWM channel instance.

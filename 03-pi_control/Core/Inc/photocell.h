@@ -9,6 +9,12 @@
 #define DEFAULT_MIN_READ    0
 #define DEFAULT_MAX_READ   4095
 
+// Maximum value passed to the PWM callback to request full brightness.
+// Set this to match the range expected by your PWM driver.
+#ifndef PHOTOCELL_PWM_TOP
+#define PHOTOCELL_PWM_TOP 100U
+#endif
+
 typedef struct {
     bool scaled;              // Whether to scale result to 0–100
     uint16_t min_value;       // Raw ADC value mapped to "0%"

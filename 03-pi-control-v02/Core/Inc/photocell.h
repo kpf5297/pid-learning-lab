@@ -9,6 +9,11 @@
 #define DEFAULT_MIN_READ    0
 #define DEFAULT_MAX_READ   4095
 
+// Maximum value passed to the PWM callback to request full brightness.
+#ifndef PHOTOCELL_PWM_TOP
+#define PHOTOCELL_PWM_TOP 100U
+#endif
+
 #define PHOTOCELL_DEFAULTS { \
     .scaled = DEFAULT_SCALING, \
     .min_value = DEFAULT_MIN_READ, \

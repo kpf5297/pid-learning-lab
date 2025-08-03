@@ -25,15 +25,13 @@ void LedPwm_stop(LedPwm_t* led) {
         led->channel, (void*)led->htim);
 }
 
-void LedPwm_setDuty(LedPwm_t* led, uint8_t duty_percent) {
-    if (duty_percent > 100) duty_percent = 100;
-    led->duty_percent = duty_percent;
+void LedPwm_setDuty(LedPwm_t* led, uint8_t duty) {
+    if (duty > LED_PWM_MAX_DUTY) duty = LED_PWM_MAX_DUTY;
+    led->duty_percent = duty;
 
-    uint32_t period = led->htim->Init.Period;
-    uint32_t pulse = (period * duty_percent) / 100;
-
+    uint32_t pulse = ((uint32_t)LED_PWM_TIMER_TOP * duty) / LED_PWM_MAX_DUTY;
     __HAL_TIM_SET_COMPARE(led->htim, led->channel, pulse);
 
-    Log(LOG_LEVEL_DEBUG, "LED PWM duty cycle set to %d%% (pulse: %lu)\n", 
+    Log(LOG_LEVEL_DEBUG, "LED PWM duty cycle set to %u (pulse: %lu)\n",
         led->duty_percent, pulse);
 }
