@@ -22,6 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f4xx_hal_tim.h"
 #include "uart_driver.h"
 #include "logging.h"
 #include "fault_module.h"
@@ -115,6 +116,9 @@ int main(void)
   MX_TIM2_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  osDelay(500);
+
   uart_system_init(&uart_drv, &huart2, &hdma_usart2_tx, &hdma_usart2_rx);
 
   photoCell_init(&photocell_sensor, &hadc1);
@@ -140,7 +144,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -422,7 +426,7 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
-  uint16_t adc_value = 0;
+  float adc_value = 0.0f;
   /* Infinite loop */
   for(;;)
   {
@@ -433,6 +437,23 @@ void StartDefaultTask(void const * argument)
     HAL_UART_Transmit(&huart2, (uint8_t*)test_msg, strlen(test_msg), 1000);
 
     log_write(LOG_LEVEL_INFO, "Default task running");
+
+    // Read the photocell sensor
+    adc_value = readSensor(&photocell_sensor);
+
+    if (photocell_sensor.scaled) {
+        log_write(LOG_LEVEL_INFO, "Scaled light level: %.2f%%", photocell_sensor.current_level);
+    } else {
+        log_write(LOG_LEVEL_INFO, "Raw ADC value: %d", photocell_sensor.last_raw_value);
+    }
+
+    // set diode brightness randomly
+    if (photocell_sensor.htim != NULL && photocell_sensor.pwm_channel != UINT32_MAX) {
+        uint32_t pwm_value = (uint32_t)(adc_value * 10.0f); // Scale to 0-1000 for 10-bit PWM
+        set_pwm(photocell_sensor.htim, photocell_sensor.pwm_channel, pwm_value);
+    } else {
+        log_write(LOG_LEVEL_ERROR, "PWM not configured for photocell sensor");
+    }
     
   }
   /* USER CODE END 5 */
