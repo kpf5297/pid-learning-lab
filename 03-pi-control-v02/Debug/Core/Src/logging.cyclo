@@ -1,6 +1,0 @@
-../Core/Src/logging.c:19:13:log_tx	8
-../Core/Src/logging.c:42:18:get_current_timestamp	1
-../Core/Src/logging.c:52:6:log_init	2
-../Core/Src/logging.c:67:6:log_write	3
-../Core/Src/logging.c:86:6:telemetry_send	3
-../Core/Src/logging.c:97:13:log_task	5

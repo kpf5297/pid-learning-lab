@@ -1,5 +1,0 @@
-../Core/Src/pwm.c:15:6:Pwm_init	24	static
-../Core/Src/pwm.c:25:6:Pwm_start	16	static
-../Core/Src/pwm.c:30:6:Pwm_stop	16	static
-../Core/Src/pwm.c:38:6:Pwm_setDuty	24	static
-../Core/Src/pwm.c:47:13:Pwm_getVersion	4	static

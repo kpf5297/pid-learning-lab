@@ -1,7 +1,0 @@
-../Core/Src/fault_module.c:21:18:get_current_timestamp_local	1
-../Core/Src/fault_module.c:30:6:fault_init	1
-../Core/Src/fault_module.c:35:6:fault_raise	3
-../Core/Src/fault_module.c:47:6:fault_clear	3
-../Core/Src/fault_module.c:56:6:fault_is_active	3
-../Core/Src/fault_module.c:62:6:fault_clear_all	1
-../Core/Src/fault_module.c:69:13:fault_to_string	2

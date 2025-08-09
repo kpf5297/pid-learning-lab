@@ -1,3 +1,0 @@
-../Core/Src/command_module.c:18:13:uart_event_cb	24	static,ignoring_inline_asm
-../Core/Src/command_module.c:35:13:cmd_task	224	static
-../Core/Src/command_module.c:94:6:cmd_init	24	static

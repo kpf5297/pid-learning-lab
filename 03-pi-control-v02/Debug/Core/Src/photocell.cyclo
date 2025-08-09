@@ -1,4 +1,0 @@
-../Core/Src/photocell.c:17:20:map_range	1
-../Core/Src/photocell.c:32:6:photoCell_init	1
-../Core/Src/photocell.c:40:6:photoCell_autoCalibrate	4
-../Core/Src/photocell.c:83:9:readSensor	5

@@ -1,6 +1,0 @@
-../Core/Src/command_module.c:19:13:cmd_tx_bytes	4
-../Core/Src/command_module.c:32:6:cmd_write	3
-../Core/Src/command_module.c:38:6:cmd_printf	4
-../Core/Src/command_module.c:63:13:uart_event_cb	4
-../Core/Src/command_module.c:80:13:cmd_task	14
-../Core/Src/command_module.c:139:6:cmd_init	2
